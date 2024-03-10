@@ -1,0 +1,41 @@
+trigger:
+- master
+- develop
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+
+- task: TerraformInstaller@1
+  inputs:
+    terraformVersion: '1.2.0'
+
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    backendServiceArm: 'Azure subscription 1(1)(77b45418-7fb5-4763-bc5c-fa8dccc10889)'
+    backendAzureRmResourceGroupName: 'rg-test'
+    backendAzureRmStorageAccountName: 'backend21212'
+    backendAzureRmContainerName: 'backend'
+    backendAzureRmKey: 'terraform.tfstate'
+
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'validate'
+
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'plan'
+    commandOptions: '--var-file=terraform.tfvars'
+    environmentServiceNameAzureRM: 'Azure subscription 1(1)(77b45418-7fb5-4763-bc5c-fa8dccc10889)'
+
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'apply'
+    commandOptions: '--var-file=terraform.tfvars'
+    environmentServiceNameAzureRM: 'Azure subscription 1(1)(77b45418-7fb5-4763-bc5c-fa8dccc10889)'
